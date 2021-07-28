@@ -15,6 +15,8 @@ def loaddb(key):
     return "Key Error: Not Found"
   return toreturn
 
+
+
 def createdb():
   with open("db.json") as f:
     db = json.load(f)
@@ -51,7 +53,18 @@ def key():
   action = request.args.get("action")
   keyx = request.args.get("key")
   db = loaddb(keyx)
-  return db.text
+  if action == "read":
+	return db.text
+  elif action == "write":
+	table = request.args.get("table")
+	value = request.args.get("value")
+	db[table] = [value]
+	with open("db.json","w") as z:
+		json.dump(db,z)
+	return "Success"
+  else:
+	return "Please supply an action"
+
   
 
 def run():
