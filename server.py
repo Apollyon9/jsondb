@@ -5,13 +5,33 @@ import json
 import subprocess
 import os
 
-path = "db/"
+def runcmd(command):
+    subprocess.check_output(command,shell=True)
 
+norm = os.getcwd()
+path = f"../db"
+path = path.replace("//","/")
+maindbpath = f".."
+maindbpath = maindbpath.replace("//","")
+files = []
+core = ["db","db.json","usedcodes.json"]
+for ffs in os.listdir(f"{maindbpath}/"):
+	files.append(ffs)
+for item in core:
+	if item not in files:
+		print("-->  Creating db core")
+		runcmd(f"cd {maindbpath} && touch db.json")
+		runcmd(f"cd {maindbpath} && touch usedcodes.json")
+		with open(f"{maindbpath}/db.json","w") as dbjson:
+			dbjson.write("{}")
+		with open(f"{maindbpath}/usedcodes.json","w") as usjson:
+			usjson.write("{}")
+		runcmd(f"cd {maindbpath} && mkdir db")
 code = ["a","b","c","d","e","f","g","h","i","j","k","l","m","n","o","p","q","r","s","t","u","v","w","x","y","z","1","2","3","4","5","6","7","8","9","0"]
 
 def loaddb(key,pwd):
   toreturn = ""
-  with open("db.json") as f:
+  with open(f"{maindbpath}/db.json") as f:
     db = json.load(f)
   try:
     folder = db[str(key)]
@@ -21,12 +41,10 @@ def loaddb(key,pwd):
     return "Key Error: Not Found"
   return db2
 
-def runcmd(command):
-    subprocess.check_output(command,shell=True)
 
 def createdb(folder,pwd):
 	cl = 30
-	with open("db.json") as f:
+	with open(f"{maindbpath}/db.json") as f:
 		db = json.load(f)
 	with open("usedcodes.json","r") as x:
 		us = json.load(x)
@@ -40,7 +58,7 @@ def createdb(folder,pwd):
 			cl -= 1
 	us.append(codex)
 	db[str(codex)] = str(folder)
-	print("-> Creating database folder...")
+	print("-->  Creating database folder...")
 	for folders in os.listdir(f"{path}"):
 		if folders == folder:
 			return "db already exists"
@@ -52,9 +70,9 @@ def createdb(folder,pwd):
 	with open(f"{path}/{folder}/pwd.json","w") as pwddb:
 		pwddb.write(str({"pwd":f"{pwd}"}))
 
-	with open("db.json","w") as z:
+	with open(f"{maindbpath}/db.json","w") as z:
 		json.dump(db,z)
-	with open("usedcodes.json","w") as z:
+	with open(f"{maindbpath}/usedcodes.json","w") as z:
 		json.dump(us,z)
 	return codex
   
@@ -70,7 +88,7 @@ def home():
 
 @app.route("/key/")
 def key():
-  with open("db.json") as m:
+  with open(f"{maindbpath}/db.json") as m:
     maindb = json.load(m)
   data = request.args.get("data")
   data = json.loads(data)
@@ -86,11 +104,11 @@ def key():
     write = str(write)
     write = write.replace("'",""" " """)
     print(str(write))
-    #try:
-    writetest = json.loads(str(write))
-    #except:
-      #return "please enter in json format"
-    print("-> Writing data...")
+    try:
+    	writetest = json.loads(str(write))
+    except:
+      return "please enter in json format"
+    print("-->  Writing data...")
     runcmd(f"rm -rf {path}/{folder}/db.json")
     runcmd(f"touch {path}/{folder}/db.json")
     with open(f"{path}/{folder}/db.json","w") as writedb:
