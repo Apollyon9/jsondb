@@ -15,6 +15,7 @@ def shell(command):
     subprocess.check_output(command,shell=True)
 
 def connect(data=None):
+	print("--> Connecting..")
 	data = str(data)
 	data = data.replace("'",""" " """)
 	data = data.replace(" ","")
@@ -44,9 +45,11 @@ def connect(data=None):
 		file = json.loads(file)
 	else:
 		return print("--> Database not found: Creation needed")
+	print("--> Connected")
 	return file
 
 def write(jsonfile):
+	print("--> Writing data...")
 	with open("jsondb.json","r") as f:
 		cfg = json.load(f)
 	key = cfg["key"]
